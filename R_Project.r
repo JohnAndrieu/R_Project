@@ -127,6 +127,13 @@ bp_female <- ggplot(groupby, aes(x=Age, y=Sport, color=Sport)) +
 g <- arrangeGrob(bp_male, bp_female, ncol=1, nrow=2)
 ggsave(file="/Users/jonathan/Desktop/R_Project/Plot/Age.pdf", g)
 
+### Les sports où on est le plus agé et le plus jeune
+
+TopAge <- summer_recent_JO %>%
+  group_by(Sport) %>%
+  select(Age)
+
+AgesMeds <- ddply(na.omit(TopAge), .(Sport), summarise, mea = mean(Age))
 
 ##################################
 ### Which country won the most ###
@@ -146,7 +153,8 @@ country_medals = res[keeps]
 names(country_medals)[1] <- "country"
 names(country_medals)[2] <- "medals"
 
-#TODO: renommer usa
+country_medals$country[which(country_medals$country == "United States")] <- "United States of America"
+country_medals
 
 couleurs <- colorRampPalette(c('white', 'red'))
 
@@ -159,7 +167,7 @@ hc <- highchart() %>%
   )  %>% 
   hc_colorAxis(minColor="white", maxColor="#b12134") %>% 
   hc_title(text = "Nombre de médaillés", style=list(color="#b12134", fontSize = "50px")) %>% 
-  hc_subtitle(text = "en baseball, handball, hockey, softball & water polo depuis 1980", style=list(color="black", fontSize = "20px"))
+  hc_subtitle(text = "dans tous les sports depuis 1980", style=list(color="black", fontSize = "20px"))
 
 hc #visualisation
 
@@ -190,7 +198,7 @@ count_medals <- function(MyData) {
 }
 
 count_participant <- function(MyData) {
-  df <- data.frame(Year=character(),Nb_Participant=integer())
+  df <- data.frame(Year=integer(),Nb_Participant=integer())
   for (year in c(1980, 1984, 1988, 1992, 1996, 2000, 2004, 2008, 2012, 2016)) {
     filter1 <- filter(MyData, Year == year)
     participants <- unique(filter1$Name)
@@ -205,61 +213,104 @@ years <- data.frame(Year=c(1980, 1984, 1988, 1992, 1996, 2000, 2004, 2008, 2012,
 JO_URSS <- filter(summer_recent_JO, Team == "Soviet Union")
 urss_nb_medal <- count_medals(JO_URSS)
 urss_nb_participant <- count_participant(JO_URSS)
-urss_ratio <- data.frame(urss_ratio=urss_nb_medal$sum_medals / urss_nb_participant$Nb_Participant)
-years <- cbind(years,urss_ratio)
+URSS <- data.frame(URSS=urss_nb_medal$sum_medals / urss_nb_participant$Nb_Participant)
+years <- cbind(years,URSS)
 
 JO_USA <- filter(summer_recent_JO, Team == "United States")
 usa_nb_medal <- count_medals(JO_USA)
 usa_nb_participant <- count_participant(JO_USA)
-usa_ratio <- data.frame(usa_ratio=usa_nb_medal$sum_medals / usa_nb_participant$Nb_Participant)
-years <- cbind(years,usa_ratio)
+USA <- data.frame(USA=usa_nb_medal$sum_medals / usa_nb_participant$Nb_Participant)
+years <- cbind(years,USA)
 
 JO_Korea <- filter(summer_recent_JO, Team == "South Korea")
 korea_nb_medal <- count_medals(JO_Korea)
 korea_nb_participant <- count_participant(JO_Korea)
-korea_ratio <- data.frame(korea_ratio=korea_nb_medal$sum_medals / korea_nb_participant$Nb_Participant)
-years <- cbind(years,korea_ratio)
+Corée <- data.frame(Corée=korea_nb_medal$sum_medals / korea_nb_participant$Nb_Participant)
+years <- cbind(years,Corée)
 
 JO_Spain <- filter(summer_recent_JO, Team == "Spain")
 spain_nb_medal <- count_medals(JO_Spain)
 spain_nb_participant <- count_participant(JO_Spain)
-spain_ratio <- data.frame(spain_ratio=spain_nb_medal$sum_medals / spain_nb_participant$Nb_Participant)
-years <- cbind(years,spain_ratio)
+Espagne <- data.frame(Espagne=spain_nb_medal$sum_medals / spain_nb_participant$Nb_Participant)
+years <- cbind(years,Espagne)
 
 JO_Australia <- filter(summer_recent_JO, Team == "Australia")
 australia_nb_medal <- count_medals(JO_Australia)
 australia_nb_participant <- count_participant(JO_Australia)
-australia_ratio <- data.frame(australia_ratio=australia_nb_medal$sum_medals / australia_nb_participant$Nb_Participant)
-years <- cbind(years,australia_ratio)
+Australie <- data.frame(Australie=australia_nb_medal$sum_medals / australia_nb_participant$Nb_Participant)
+years <- cbind(years,Australie)
 
 JO_Greece <- filter(summer_recent_JO, Team == "Greece")
 greece_nb_medal <- count_medals(JO_Greece)
 greece_nb_participant <- count_participant(JO_Greece)
-greece_ratio <- data.frame(greece_ratio=greece_nb_medal$sum_medals / greece_nb_participant$Nb_Participant)
-years <- cbind(years,greece_ratio)
+Grèce <- data.frame(Grèce=greece_nb_medal$sum_medals / greece_nb_participant$Nb_Participant)
+years <- cbind(years,Grèce)
 
 JO_China <- filter(summer_recent_JO, Team == "China")
 china_nb_medal <- count_medals(JO_China)
 china_nb_participant <- count_participant(JO_China)
-china_ratio <- data.frame(china_ratio=china_nb_medal$sum_medals / china_nb_participant$Nb_Participant)
-years <- cbind(years,china_ratio)
+Chine <- data.frame(Chine=china_nb_medal$sum_medals / china_nb_participant$Nb_Participant)
+years <- cbind(years,Chine)
 
 JO_GB <- filter(summer_recent_JO, Team == "Great Britain")
 gb_nb_medal <- count_medals(JO_GB)
 gb_nb_participant <- count_participant(JO_GB)
-gb_ratio <- data.frame(gb_ratio=gb_nb_medal$sum_medals / gb_nb_participant$Nb_Participant)
-years <- cbind(years,gb_ratio)
+RoyaumeUni <- data.frame(RoyUni=gb_nb_medal$sum_medals / gb_nb_participant$Nb_Participant)
+years <- cbind(years,RoyaumeUni)
 
 JO_Brazil <- filter(summer_recent_JO, Team == "Brazil")
 brazil_nb_medal <- count_medals(JO_Brazil)
 brazil_nb_participant <- count_participant(JO_Brazil)
-brazil_ratio <- data.frame(brazil_ratio=brazil_nb_medal$sum_medals / brazil_nb_participant$Nb_Participant)
-years <- cbind(years,brazil_ratio)
+Brésil <- data.frame(Brésil=brazil_nb_medal$sum_medals / brazil_nb_participant$Nb_Participant)
+years <- cbind(years,Brésil)
 
-df_plot <- melt(years ,  id.vars = 'Year', variable.name = 'Country')
+JO_Russia <- filter(summer_recent_JO, Team == "Russia")
+russia_nb_medal <- count_medals(JO_Russia)
+russia_nb_participant <- count_participant(JO_Russia)
+Russie <- data.frame(Russie=russia_nb_medal$sum_medals / russia_nb_participant$Nb_Participant)
+years <- cbind(years,Russie)
 
-ggplot(df_plot, aes(Year,value)) + geom_line(aes(colour = Country))
+keeps <- c("Year","URSS","Russie","Chine","USA", "Australie")
+batch1 = years[keeps]
 
-#remove all inf
-#format x axe
+keeps <- c("Year","Corée","Grèce","Brésil","RoyUni", "Espagne")
+batch2 = years[keeps]
+
+batch1_melt <- melt(batch1 ,  id.vars = 'Year', variable.name = 'Pays')
+batch2_melt <- melt(batch2 ,  id.vars = 'Year', variable.name = 'Pays')
+
+df1_plot <- batch1_melt[batch1_melt$value != Inf,]
+df2_plot <- batch2_melt[batch2_melt$value != Inf,]
+
+color1 = c("red", "red", "yellow", "blue", "black")
+color2 = c("pink", "orange", "darkgreen", "purple", "turquoise")
+
+b1 <- ggplot(df1_plot, aes(Year,value, colour = Pays, shape = Pays)) + 
+  scale_shape_manual(values=1:nlevels(df1_plot$Pays)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = seq(1980, 2016, 4)) +
+  scale_colour_manual(values = color1) +
+  ylab("Ratio") +
+  ylim(0,1) +
+  theme(axis.text.x=element_text(size=8),axis.title.x=element_text(size=10),axis.text.y=element_text(size=8),axis.title.y=element_text(size=10),legend.text = element_text(size=8))
+
+b2 <- ggplot(df2_plot, aes(Year,value, colour = Pays, shape = Pays)) + 
+  scale_shape_manual(values=1:nlevels(df2_plot$Pays)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = seq(1980, 2016, 4)) +
+  scale_colour_manual(values = color2) +
+  ylab("Ratio") +
+  ylim(0,0.5) +
+  theme(axis.text.x=element_text(size=8),axis.title.x=element_text(size=10),axis.text.y=element_text(size=8),axis.title.y=element_text(size=10),legend.text = element_text(size=8))
+
+g <- arrangeGrob(b1, b2, ncol=1, nrow=2)
+ggsave(file="/Users/jonathan/Desktop/R_Project/Plot/RatioCountries.pdf", g)
+
+
+#### Info sur Johnny Weissmuller l'acteur de Tarzan !
+
+dataJohnny <- filter(dataset_JO, Name == "Peter Johann \"Johnny\" Weissmuller")
+  
 
